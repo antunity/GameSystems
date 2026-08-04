@@ -6,7 +6,7 @@ namespace antunity.GameSystems.Rules
 {
     [Serializable]
     [GameDataDrawer(GameDataLayout.Horizontal)]
-    public struct HasDataRuleStruct : IRule, IUseGameDataDrawer
+    public struct HasDataStruct : IRule, IUseGameDataDrawer
     {
         [Tooltip("The source for the data to check")]
         [SerializeField] private GameDataSource source;
@@ -31,9 +31,9 @@ namespace antunity.GameSystems.Rules
 
     [Serializable]
     [CreateAssetMenu(fileName = FILE_NAME.RULE_HAS_DATA, menuName = MENU_PATH.RULE_HAS_DATA)]
-    public class HasDataRule : Rule
+    public class HasData : Rule
     {
-        [SerializeField] private HasDataRuleStruct rule;
+        [SerializeField] private HasDataStruct rule;
 
         public override RuleResult Evaluate(IGameContext context) => rule.Evaluate(context);
     }

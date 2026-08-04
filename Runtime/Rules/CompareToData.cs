@@ -6,7 +6,7 @@ namespace antunity.GameSystems.Rules
 {
     [Serializable]
     [GameDataDrawer(GameDataLayout.Horizontal)]
-    public struct CompareToDataRuleStruct : IRule, IUseGameDataDrawer
+    public struct CompareToDataStruct : IRule, IUseGameDataDrawer
     {
         [Tooltip("The source for the first data to compare")]
         [SerializeField] private GameDataSource source1;
@@ -117,9 +117,9 @@ namespace antunity.GameSystems.Rules
 
     [Serializable]
     [CreateAssetMenu(fileName = FILE_NAME.RULE_COMPARE_DATA, menuName = MENU_PATH.RULE_COMPARE_DATA)]
-    public class CompareToDataRule : Rule
+    public class CompareToData : Rule
     {
-        [SerializeField] private CompareToDataRuleStruct rule;
+        [SerializeField] private CompareToDataStruct rule;
 
         public override RuleResult Evaluate(IGameContext context) => rule.Evaluate(context);
     }
