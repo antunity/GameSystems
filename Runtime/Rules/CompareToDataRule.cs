@@ -77,23 +77,25 @@ namespace antunity.GameSystems.Rules
             if (invert)
                 effectiveOperation = GetInverseOperation(operation);
 
+            var contextIndex = context.GetIndex();
+
             switch (effectiveOperation)
             {
                 case ComparisonOperation.GreaterOrEqual:
                 case ComparisonOperation.Greater:
-                    return RuleResult.MinimumRequirementViolation(data1, value1);
+                    return RuleResult.ValueTooLow(contextIndex, data1, value1);
                 case ComparisonOperation.LessOrEqual:
                 case ComparisonOperation.Less:
-                    return RuleResult.MaximumRequirementViolation(data1, value1);
+                    return RuleResult.ValueTooHigh(contextIndex, data1, value1);
                 case ComparisonOperation.Equal:
                     if (value1 > value2)
-                        return RuleResult.MaximumRequirementViolation(data1, value1);
+                        return RuleResult.ValueTooHigh(contextIndex, data1, value1);
                     else
-                        return RuleResult.MinimumRequirementViolation(data1, value1);
+                        return RuleResult.ValueTooLow(contextIndex, data1, value1);
                 case ComparisonOperation.NotEqual:
-                    return RuleResult.InvalidValue(data1, value1);
+                    return RuleResult.ValueInvalid(contextIndex, data1, value1);
                 default:
-                    return RuleResult.UnknownFailure();
+                    return RuleResult.UnknownFailure(contextIndex);
             }
         }
 

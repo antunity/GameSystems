@@ -35,7 +35,7 @@ namespace antunity.GameSystems.Rules
                     result = rule1.Evaluate(context) || rule2.Evaluate(context);
                     break;
                 default:
-                    result = RuleResult.UnknownFailure();
+                    result = RuleResult.UnknownFailure(context.GetIndex());
                     break;
             }
 

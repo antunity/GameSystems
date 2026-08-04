@@ -25,7 +25,7 @@ namespace antunity.GameSystems.Rules
         {
             var resultRaw = context.Resolve<bool>(source, data);
             var result = invert ? !resultRaw : resultRaw;
-            return result ? RuleResult.Success() : RuleResult.DataPresenceViolation(data, resultRaw ? 1f : 0f);
+            return result ? RuleResult.Success() : RuleResult.DataMissing(context.GetIndex(), data, resultRaw ? 1f : 0f);
         }
     }
 

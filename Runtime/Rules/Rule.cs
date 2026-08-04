@@ -7,10 +7,10 @@ namespace antunity.GameSystems.Rules
     {
         None,
         UnknownFailure,
-        InvalidValue,
-        MinimumRequirementViolation,
-        MaximumRequirementViolation,
-        DataPresenceViolation,
+        ValueInvalid,
+        ValueTooLow,
+        ValueTooHigh,
+        DataMissing,
     }
 
     public struct RuleResult
@@ -19,11 +19,13 @@ namespace antunity.GameSystems.Rules
 
         public static bool operator false(RuleResult original) => !original.IsSuccess;
 
-        public static RuleResult operator !(RuleResult original) => original.IsSuccess ? InvalidValue(original.RequiredData, original.ActualValue) : original;
+        public static RuleResult operator !(RuleResult original) => original.IsSuccess ? ValueInvalid(original.CallerIndex, original.RequiredData, original.ActualValue) : original;
 
         public static RuleResult operator & (RuleResult left, RuleResult right) => !left.IsSuccess ? left : right;
 
         public static RuleResult operator | (RuleResult left, RuleResult right) => left.IsSuccess ? left : right;
+
+        public readonly object CallerIndex;
 
         public readonly bool IsSuccess;
 
@@ -31,30 +33,34 @@ namespace antunity.GameSystems.Rules
         
         public readonly IGameDataBase RequiredData; 
 
-        public readonly float ActualValue; 
+        public readonly float ActualValue;
 
-        public RuleResult(bool success, RuleFailureCode failureCode, IGameDataBase requiredData = null, float actualValue = 0f)
+        public readonly string Message;
+
+        public RuleResult(object callerIndex, bool success, RuleFailureCode failureCode, IGameDataBase requiredData = null, float actualValue = 0f, string message = null)
         {
+            CallerIndex = callerIndex;
             IsSuccess = success;
             FailureCode = failureCode;
             RequiredData = requiredData;
             ActualValue = actualValue;
+            Message = message;
         }
 
         // Static constructors for ease of use
-        public static RuleResult Success() => new(true, RuleFailureCode.None, null, 0);
+        public static RuleResult Success() => new(null, true, RuleFailureCode.None, null, 0, null);
         
-        public static RuleResult Fail(RuleFailureCode code, IGameDataBase requiredData, float actualValue) => new(false, code, requiredData, actualValue);
+        public static RuleResult Fail(object callerIndex, RuleFailureCode code, IGameDataBase requiredData, float actualValue, string message = null) => new(callerIndex, false, code, requiredData, actualValue, message);
 
-        public static RuleResult DataPresenceViolation(IGameDataBase data, float actualValue) => new(false, RuleFailureCode.DataPresenceViolation, data, actualValue);
+        public static RuleResult DataMissing(object callerIndex, IGameDataBase data, float actualValue, string message = null) => new(callerIndex, false, RuleFailureCode.DataMissing, data, actualValue, message);
 
-        public static RuleResult MaximumRequirementViolation(IGameDataBase data, float actualValue) => new(false, RuleFailureCode.MaximumRequirementViolation, data, actualValue);
+        public static RuleResult ValueTooHigh(object callerIndex, IGameDataBase data, float actualValue, string message = null) => new(callerIndex, false, RuleFailureCode.ValueTooHigh, data, actualValue, message);
 
-        public static RuleResult MinimumRequirementViolation(IGameDataBase data, float actualValue) => new(false, RuleFailureCode.MinimumRequirementViolation, data, actualValue);
+        public static RuleResult ValueTooLow(object callerIndex, IGameDataBase data, float actualValue, string message = null) => new(callerIndex, false, RuleFailureCode.ValueTooLow, data, actualValue, message);
 
-        public static RuleResult InvalidValue(IGameDataBase data, float actualValue) => new(false, RuleFailureCode.InvalidValue, data, actualValue);
+        public static RuleResult ValueInvalid(object callerIndex, IGameDataBase data, float actualValue, string message = null) => new(callerIndex, false, RuleFailureCode.ValueInvalid, data, actualValue, message);
 
-        public static RuleResult UnknownFailure() => new(false, RuleFailureCode.UnknownFailure, null, 0);
+        public static RuleResult UnknownFailure(object callerIndex, string message = null) => new(callerIndex, false, RuleFailureCode.UnknownFailure, null, 0, message);
     }
 
     public interface IRule
