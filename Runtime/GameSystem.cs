@@ -6,14 +6,14 @@ namespace antunity.GameSystems
 {
     public interface IGameSystemBase
     {
-        public IGameDataProvider Environment { get; set; }
+        public IGameDataReader Instigator { get; set; }
 
         public void Initialize(GameSystemTemplate template);
     }
 
     public interface IGameSystem<TAction> : IGameSystemBase where TAction : struct
     {
-        public RuleResult EvaluateAction(TAction action, IGameDataProvider subject, IGameDataProvider instigator = null);
+        public RuleResult EvaluateAction(TAction action, IGameDataReader instigator, IGameDataReader subject, IGameDataReader environment);
 
         public IGameContext GetActionContext(TAction action);
 
@@ -30,7 +30,7 @@ namespace antunity.GameSystems
 
         #region IGameSystemBase
 
-        public IGameDataProvider Environment { get; set; }
+        public IGameDataReader Instigator { get; set; }
 
         public abstract void Initialize(GameSystemTemplate template);
 
@@ -38,7 +38,7 @@ namespace antunity.GameSystems
 
         #region IGameSystem
 
-        public RuleResult EvaluateAction(TAction action, IGameDataProvider subject, IGameDataProvider instigator = null)
+        public RuleResult EvaluateAction(TAction action, IGameDataReader instigator, IGameDataReader subject, IGameDataReader environment)
         {
             if (!rules.ContainsIndex(action))
                 return RuleResult.Success();
@@ -54,17 +54,9 @@ namespace antunity.GameSystems
                 actionContexts.Add(context);
             }
 
-            // Default to the system's environment
-            context.Environment ??= Environment;
-
-            // Assign subject
+            context.Environment = environment;
             context.Subject = subject;
-
-            // Assign the instigator if defined
-            if (instigator != null)
-                context.Instigator = instigator;
-            else
-                context.Instigator = context.Environment;
+            context.Instigator = instigator;
     
             return actionRule.Evaluate(context);
         }

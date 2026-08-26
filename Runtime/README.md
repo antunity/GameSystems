@@ -2,7 +2,7 @@
 
 **antunity.GameSystems** is a data-driven framework for the Unity Engine designed to handle complex action logic, requirement validation, and rule systems. Built on the **antunity.GameData** toolkit, it decouples gameplay logic from specific implementations, allowing for highly composable and designer-friendly systems.
 
-### Dependencies
+## Dependencies
 This toolkit utilizes and requires [antunity.GameData](https://github.com/antUnity/GameData) to be installed.
 
 ## Core Concepts
@@ -12,25 +12,29 @@ The `GameSystem` is the central hub for managing gameplay logic. It maps specifi
 
 ### 2. The Action Context (`IGameContext`)
 Rules query an `IGameContext` for game data. The built-in context tracks three potential sources of data for any given action:
-* **Environment**: The global system or manager state.
-* **Instigator**: The entity performing the action (e.g., a Player or Unit).
-* **Subject**: The target of the action (e.g., a Chest, an Enemy, or an Item).
+- **Environment**: The global system or manager state.
+- **Instigator**: The entity performing the action (e.g., a Player or Unit).
+- **Subject**: The target of the action (e.g., a Chest, an Enemy, or an Item).
+- **Context**: The context containing all of the above.
 
-### 3. Data Querying (`IGameDataProvider`)
-In order for a game system to interact with an entity, the entity must implement the `IGameDataProvider` interface. This allows the context to resolve values using `antunity.GameData` assets as keys:
+### 3. Data Querying (`IGameDataReader` and IGameDataReader<T>`)
+In order for a game system to interact with an entity, the entity must implement the `IGameDataReader<T>` interface. This allows the context to resolve values using `antunity.GameData` assets as keys:
 ```csharp
 public T Query<T>();
 public T Query<T>(IGameDataBase data);
+```
+
+### 4. Data Mutation (`IGameDataMutator<T>`)
+Classes which can be used to modify game data should implement the `IGameDataMutator<T>` interface:
+```csharp
 public void Mutate<T>(IGameDataBase data, T value);
 ```
 
-### 4. Rich Rule Results (`RuleResult`)
+### 5. Rich Rule Results (`RuleResult`)
 The `RuleResult` struct provides detailed feedback beyond a simple boolean:
-* **Success State**: Evaluated via `if (result)`.
-* **Failure Codes**: Specific reasons (e.g., `MinimumRequirementViolation`).
-* **Violation Context**: References to the specific data asset and the actual value that caused the failure, making it easy to drive UI tooltips.
-
----
+- **Success State**: Evaluated via `if (result)`.
+- **Failure Codes**: Specific reasons (e.g., `MinimumRequirementViolation`).
+- **Violation Context**: References to the specific data asset and the actual value that caused the failure, making it easy to drive UI tooltips.
 
 ## Rule Types
 
@@ -44,21 +48,17 @@ The toolkit includes several built-in `Rule` types (ScriptableObjects) that can 
 
 These rules can be created as scriptable objects (`Rules`) or serialized within another scriptable object.
 
----
-
 ## Implementation Example
 
 ### 1. Defining a Data-Driven Entity
-Implement `IGameDataProvider` on your MonoBehaviours to allow the Action System to "read" your entity's stats.
-
-
+Implement `IGameDataReader` on your MonoBehaviours to allow the Action System to "read" your entity's stats.
 
 ```csharp
 using UnityEngine;
 using antunity.GameData;
 using antunity.GameSystems;
 
-public class UnitStats : MonoBehaviour, IGameDataProvider
+public class UnitStats : MonoBehaviour, IGameDataReader
 {
     [SerializeField] private GameDataValues<StatAsset, float> stats;
 
@@ -98,8 +98,6 @@ public void OnInteract(Unit player, Chest target)
     }
 }
 ```
-
----
 
 ## Technical Features
 

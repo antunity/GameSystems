@@ -1,6 +1,6 @@
 {
   "name": "com.antunity.gamesystems",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "displayName": "Game Systems",
   "description": "Game systems library for Unity",
   "unity": "6000.3",

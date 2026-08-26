@@ -6,27 +6,33 @@ namespace antunity.GameSystems
 {
     public enum GameDataSource
     {
-        Environment,    // e.g. ability book, inventory owner
-        Instigator,     // e.g. an external trigger for an action, e.g. a customer in a vendor transaction. if omitted, it matches the environment
+        Instigator,     // e.g. an external trigger for an action, e.g. a customer in a vendor transaction
         Subject,        // e.g. ability, item, ability
+        Environment,    // e.g. ability book, inventory owner
+        Context,        // e.g. the context containing all of the above
     }
 
-    public interface IGameDataProvider
+    public interface IGameDataReader { }
+
+    public interface IGameDataReader<out T> : IGameDataReader
     {
-        T Query<T>() => throw new NotImplementedException();
+        T Query() => throw new NotImplementedException();
 
-        T Query<T>(IGameDataBase data) => throw new NotImplementedException();
+        T Query(IGameDataBase data) => throw new NotImplementedException();
+    }
 
-        void Mutate<T>(IGameDataBase data, T value) => throw new NotImplementedException();
+    public interface IGameDataMutator<in T>
+    {
+        void Mutate(IGameDataBase data, T value) => throw new NotImplementedException();
     }
 
     public interface IGameContext : IGameDataBase
     {
-        IGameDataProvider Instigator { get; set; }
+        IGameDataReader Instigator { get; set; }
 
-        IGameDataProvider Subject { get; set; }
+        IGameDataReader Subject { get; set; }
 
-        IGameDataProvider Environment { get; set; }
+        IGameDataReader Environment { get; set; }
 
         T Resolve<T>(GameDataSource source, IGameDataBase gameData);
     }
@@ -37,18 +43,23 @@ namespace antunity.GameSystems
 
         #region IGameContext
 
-        public IGameDataProvider Instigator { get; set; } = null;
+        public IGameDataReader Instigator { get; set; } = null;
 
-        public IGameDataProvider Subject { get; set; } = null;
+        public IGameDataReader Subject { get; set; } = null;
 
-        public IGameDataProvider Environment { get; set; } = null;
+        public IGameDataReader Environment { get; set; } = null;
 
         public TResult Resolve<TResult>(GameDataSource source, IGameDataBase data)
         {
             if (data is IRuleMetric<TResult> metric)
-                return metric.Calculate(this);
+            {
+                if (source != GameDataSource.Context)
+                    throw new NotSupportedException($"{Index}: {nameof(GameDataSource)} '{source}' is not supported for {nameof(IRuleMetric<TResult>)}.");
 
-            IGameDataProvider sourceTarget;
+                return metric.Calculate(this);
+            }
+
+            IGameDataReader sourceTarget;
             switch (source)
             {
                 case GameDataSource.Environment:
@@ -67,7 +78,10 @@ namespace antunity.GameSystems
             if (sourceTarget == null)
                 throw new NullReferenceException($"{Index}: {nameof(GameDataSource)} '{source}' is not specified in this context.");
 
-            return sourceTarget.Query<TResult>(data);
+            if (sourceTarget is not IGameDataReader<TResult> provider)
+                throw new NotSupportedException($"{Index}: {nameof(GameDataSource)} '{source}' does not support querying for type '{typeof(TResult).Name}'.");
+
+            return provider.Query(data);
         }
 
         #endregion IGameContext
