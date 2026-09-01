@@ -16,7 +16,7 @@ namespace antunity.GameSystems.Rules
             foreach (var rule in rules)
             {
                 var result = rule.Evaluate(context);
-                if (result.IsSuccess)
+                if (!result.IsSuccess)
                     return result;
             }
 

@@ -14,16 +14,28 @@ namespace antunity.GameSystems
 
     public interface IGameDataReader { }
 
-    public interface IGameDataReader<out T> : IGameDataReader
+    public interface IGameDataReader<in TIndex, out TData> : IGameDataReader where TIndex : struct where TData : IGameDataBase
     {
-        T Query() => throw new NotImplementedException();
-
-        T Query(IGameDataBase data) => throw new NotImplementedException();
+        TData QueryData(TIndex index);
     }
 
-    public interface IGameDataMutator<in T>
+    public interface IGameDataReader<out TResult> : IGameDataReader where TResult : struct
     {
-        void Mutate(IGameDataBase data, T value) => throw new NotImplementedException();
+        TResult QueryProperty(IGameDataBase gameData = null);
+    }
+
+    public interface IGameDataMutator { }
+
+    public interface IGameDataMutator<TResult> : IGameDataMutator where TResult : struct
+    {
+        void SetProperty(IGameDataBase gameData, TResult value);
+    }
+
+    public interface IGameDataModifier { }
+
+    public interface IGameDataModifier<TResult> : IGameDataModifier where TResult : struct
+    {
+        void ModifyProperty(IGameDataBase gameData, TResult value);
     }
 
     public interface IGameContext : IGameDataBase
@@ -34,7 +46,7 @@ namespace antunity.GameSystems
 
         IGameDataReader Environment { get; set; }
 
-        T Resolve<T>(GameDataSource source, IGameDataBase gameData);
+        TResult Resolve<TResult>(GameDataSource source, IGameDataBase gameData) where TResult : struct;
     }
 
     public class GameContext<TAction> : GameData<TAction>, IGameContext where TAction : struct
@@ -49,17 +61,18 @@ namespace antunity.GameSystems
 
         public IGameDataReader Environment { get; set; } = null;
 
-        public TResult Resolve<TResult>(GameDataSource source, IGameDataBase data)
+        public TResult Resolve<TResult>(GameDataSource source, IGameDataBase data) where TResult : struct
         {
-            if (data is IRuleMetric<TResult> metric)
-            {
-                if (source != GameDataSource.Context)
-                    throw new NotSupportedException($"{Index}: {nameof(GameDataSource)} '{source}' is not supported for {nameof(IRuleMetric<TResult>)}.");
+            IGameDataReader sourceTarget;
 
-                return metric.Calculate(this);
+            if (data is IRuleScript<TResult> ruleScript)
+            {
+                if (source == GameDataSource.Context)
+                    return ruleScript.Calculate(this);
+                else
+                    throw new NotSupportedException($"{nameof(GameDataSource)} for {nameof(IRuleScript<TResult>)} '{ruleScript}' must be set to {nameof(GameDataSource.Context)}.");
             }
 
-            IGameDataReader sourceTarget;
             switch (source)
             {
                 case GameDataSource.Environment:
@@ -79,9 +92,9 @@ namespace antunity.GameSystems
                 throw new NullReferenceException($"{Index}: {nameof(GameDataSource)} '{source}' is not specified in this context.");
 
             if (sourceTarget is not IGameDataReader<TResult> provider)
-                throw new NotSupportedException($"{Index}: {nameof(GameDataSource)} '{source}' does not support querying for type '{typeof(TResult).Name}'.");
+                throw new NotSupportedException($"{Index}: {source} '{sourceTarget}' does not support querying for type '{typeof(TResult).Name}'.");
 
-            return provider.Query(data);
+            return provider.QueryProperty(data);
         }
 
         #endregion IGameContext

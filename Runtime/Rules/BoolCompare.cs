@@ -6,7 +6,7 @@ namespace antunity.GameSystems.Rules
 {
     [Serializable]
     [GameDataDrawer(GameDataLayout.Horizontal)]
-    public struct HasDataStruct : IRule, IUseGameDataDrawer
+    public struct BoolCompareStruct : IRule, IUseGameDataDrawer
     {
         [Tooltip("The source for the data to check")]
         [SerializeField] private GameDataSource source;
@@ -25,15 +25,15 @@ namespace antunity.GameSystems.Rules
         {
             var resultRaw = context.Resolve<bool>(source, data);
             var result = invert ? !resultRaw : resultRaw;
-            return result ? RuleResult.Success() : RuleResult.DataMissing(context.GetIndex(), data, resultRaw ? 1f : 0f);
+            return result ? RuleResult.Success() : RuleResult.BoolCheck(context.GetIndex(), data, resultRaw ? 1f : 0f);
         }
     }
 
     [Serializable]
-    [CreateAssetMenu(fileName = FILE_NAME.RULE_HAS_DATA, menuName = MENU_PATH.RULE_HAS_DATA)]
-    public class HasData : Rule
+    [CreateAssetMenu(fileName = FILE_NAME.RULE_BOOL_COMPARE, menuName = MENU_PATH.RULE_BOOL_COMPARE)]
+    public class BoolCompare : Rule
     {
-        [SerializeField] private HasDataStruct rule;
+        [SerializeField] private BoolCompareStruct rule;
 
         public override RuleResult Evaluate(IGameContext context) => rule.Evaluate(context);
     }

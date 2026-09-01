@@ -10,7 +10,7 @@ namespace antunity.GameSystems.Rules
         ValueInvalid,
         ValueTooLow,
         ValueTooHigh,
-        DataMissing,
+        BoolCheck,
     }
 
     public struct RuleResult
@@ -52,7 +52,7 @@ namespace antunity.GameSystems.Rules
         
         public static RuleResult Fail(object callerIndex, RuleFailureCode code, IGameDataBase requiredData, float actualValue, string message = null) => new(callerIndex, false, code, requiredData, actualValue, message);
 
-        public static RuleResult DataMissing(object callerIndex, IGameDataBase data, float actualValue, string message = null) => new(callerIndex, false, RuleFailureCode.DataMissing, data, actualValue, message);
+        public static RuleResult BoolCheck(object callerIndex, IGameDataBase data, float actualValue, string message = null) => new(callerIndex, false, RuleFailureCode.BoolCheck, data, actualValue, message);
 
         public static RuleResult ValueTooHigh(object callerIndex, IGameDataBase data, float actualValue, string message = null) => new(callerIndex, false, RuleFailureCode.ValueTooHigh, data, actualValue, message);
 
