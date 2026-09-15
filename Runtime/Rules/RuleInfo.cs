@@ -8,17 +8,17 @@ namespace antunity.GameSystems.Rules
     [GameDataDrawer(GameDataLayout.Horizontal)]
     public struct RuleValues
     {
-        [SerializeField] private BoolCompareStruct hasData;
+        [SerializeField] private DataRuleStruct hasData;
 
-        [SerializeField] private CompareToValueStruct compareToValue;
+        [SerializeField] private ThresholdRuleStruct compareToValue;
 
-        [SerializeField] private CompareToDataStruct compareToData;
+        [SerializeField] private DataCompareRuleStruct compareToData;
 
-        public BoolCompareStruct HasData => hasData;
+        public DataRuleStruct HasData => hasData;
 
-        public CompareToValueStruct CompareToValue => compareToValue;
+        public ThresholdRuleStruct CompareToValue => compareToValue;
 
-        public CompareToDataStruct CompareToData => compareToData;
+        public DataCompareRuleStruct CompareToData => compareToData;
     }
 
     [Serializable]

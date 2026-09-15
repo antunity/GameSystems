@@ -3,6 +3,8 @@ using antunity.GameData;
 
 namespace antunity.GameSystems.Rules
 {
+    public enum ComparisonOperation { Greater, GreaterOrEqual, Equal, LessOrEqual, Less, NotEqual }
+
     public enum RuleFailureCode
     {
         None,

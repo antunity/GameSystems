@@ -6,7 +6,7 @@ namespace antunity.GameSystems.Rules
 {
     [Serializable]
     [CreateAssetMenu(fileName = FILE_NAME.RULE_GROUP, menuName = MENU_PATH.RULE_GROUP)]
-    public class Group : Rule
+    public class GroupRule : Rule
     {
         [Tooltip("The rules to evaluate")]
         [SerializeField] private GameDataRegistry<Rule> rules;

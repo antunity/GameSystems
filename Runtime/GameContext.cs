@@ -65,12 +65,12 @@ namespace antunity.GameSystems
         {
             IGameDataReader sourceTarget;
 
-            if (data is IRuleScript<TResult> ruleScript)
+            if (data is IScriptData<TResult> ruleScript)
             {
                 if (source == GameDataSource.Context)
                     return ruleScript.Calculate(this);
                 else
-                    throw new NotSupportedException($"{nameof(GameDataSource)} for {nameof(IRuleScript<TResult>)} '{ruleScript}' must be set to {nameof(GameDataSource.Context)}.");
+                    throw new NotSupportedException($"{nameof(GameDataSource)} for {nameof(IScriptData<TResult>)} '{ruleScript}' must be set to {nameof(GameDataSource.Context)}.");
             }
 
             switch (source)

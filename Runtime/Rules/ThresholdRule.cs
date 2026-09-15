@@ -6,61 +6,46 @@ namespace antunity.GameSystems.Rules
 {
     [Serializable]
     [GameDataDrawer(GameDataLayout.Horizontal)]
-    public struct CompareToDataStruct : IRule, IUseGameDataDrawer
+    public struct ThresholdRuleStruct : IRule, IUseGameDataDrawer
     {
-        [Tooltip("The source for the first data to compare")]
-        [SerializeField] private GameDataSource source1;
+        [Tooltip("The source for the data to compare")]
+        [SerializeField] private GameDataSource source;
 
-        [Tooltip("The first data to compare")]
-        [SerializeField] private GameDataAsset<uint> data1;
+        [Tooltip("The data to compare")]
+        [SerializeField] private GameDataAsset<uint> data;
 
         [Tooltip("The comparison operation to perform")]
         [SerializeField] private ComparisonOperation operation;
 
-        [Tooltip("The source for the second data to compare")]
-        [SerializeField] private GameDataSource source2;
-
-        [Tooltip("The second data to compare")]
-        [SerializeField] private GameDataAsset<uint> data2;
+        [Tooltip("The constant value to compare to")]
+        [SerializeField] private float value;
 
         [Tooltip("Enable to invert the result of the comparison")]
         [SerializeField] private bool invert;
 
-        public IGameDataBase Data1 => data1;
-
-        public IGameDataBase Data2 => data2;
-
-        public ComparisonOperation Operation => operation;
-
-        public GameDataSource Source1 => source1;
-
-        public GameDataSource Source2 => source2;
-
         public RuleResult Evaluate(IGameContext context)
         {
-            var value1 = context.Resolve<float>(source1, data1);
-            var value2 = context.Resolve<float>(source2, data2);
-
+            var value = context.Resolve<float>(source, data);
             bool result;
             switch (operation)
             {
                 case ComparisonOperation.Greater:
-                    result = value1 > value2;
+                    result = value > this.value;
                     break;
                 case ComparisonOperation.GreaterOrEqual:
-                    result = value1 >= value2;
+                    result = value >= this.value;
                     break;
                 case ComparisonOperation.Equal:
-                    result = Mathf.Abs(value1 - value2) < 0.0001f;
+                    result = Mathf.Abs(value - this.value) < 0.0001f;
                     break;
                 case ComparisonOperation.LessOrEqual:
-                    result = value1 <= value2;
+                    result = value <= this.value;
                     break;
                 case ComparisonOperation.Less:
-                    result = value1 < value2;
+                    result = value < this.value;
                     break;
                 case ComparisonOperation.NotEqual:
-                    result = Mathf.Abs(value1 - value2) >= 0.0001f;
+                    result = Mathf.Abs(value - this.value) >= 0.0001f;
                     break;
                 default:
                     result = false;
@@ -69,7 +54,7 @@ namespace antunity.GameSystems.Rules
 
             if (invert)
                 result = !result;
-
+            
             if (result)
                 return RuleResult.Success();
 
@@ -78,22 +63,22 @@ namespace antunity.GameSystems.Rules
                 effectiveOperation = GetInverseOperation(operation);
 
             var contextIndex = context.GetIndex();
-
+            
             switch (effectiveOperation)
             {
                 case ComparisonOperation.GreaterOrEqual:
                 case ComparisonOperation.Greater:
-                    return RuleResult.ValueTooLow(contextIndex, data1, value1);
+                    return RuleResult.ValueTooLow(contextIndex, data, value);
                 case ComparisonOperation.LessOrEqual:
                 case ComparisonOperation.Less:
-                    return RuleResult.ValueTooHigh(contextIndex, data1, value1);
+                    return RuleResult.ValueTooHigh(contextIndex, data, value);
                 case ComparisonOperation.Equal:
-                    if (value1 > value2)
-                        return RuleResult.ValueTooHigh(contextIndex, data1, value1);
+                    if (value > this.value)
+                        return RuleResult.ValueTooHigh(contextIndex, data, value);
                     else
-                        return RuleResult.ValueTooLow(contextIndex, data1, value1);
+                        return RuleResult.ValueTooLow(contextIndex, data, value);
                 case ComparisonOperation.NotEqual:
-                    return RuleResult.ValueInvalid(contextIndex, data1, value1);
+                    return RuleResult.ValueInvalid(contextIndex, data, value);
                 default:
                     return RuleResult.UnknownFailure(contextIndex);
             }
@@ -116,10 +101,10 @@ namespace antunity.GameSystems.Rules
     }
 
     [Serializable]
-    [CreateAssetMenu(fileName = FILE_NAME.RULE_COMPARE_DATA, menuName = MENU_PATH.RULE_COMPARE_DATA)]
-    public class CompareToData : Rule
+    [CreateAssetMenu(fileName = FILE_NAME.RULE_THRESHOLD, menuName = MENU_PATH.RULE_THRESHOLD)]
+    public class ThresholdRule : Rule
     {
-        [SerializeField] private CompareToDataStruct rule;
+        [SerializeField] private ThresholdRuleStruct rule;
 
         public override RuleResult Evaluate(IGameContext context) => rule.Evaluate(context);
     }

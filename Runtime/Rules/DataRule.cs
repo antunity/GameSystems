@@ -6,7 +6,7 @@ namespace antunity.GameSystems.Rules
 {
     [Serializable]
     [GameDataDrawer(GameDataLayout.Horizontal)]
-    public struct BoolCompareStruct : IRule, IUseGameDataDrawer
+    public struct DataRuleStruct : IRule, IUseGameDataDrawer
     {
         [Tooltip("The source for the data to check")]
         [SerializeField] private GameDataSource source;
@@ -30,10 +30,10 @@ namespace antunity.GameSystems.Rules
     }
 
     [Serializable]
-    [CreateAssetMenu(fileName = FILE_NAME.RULE_BOOL_COMPARE, menuName = MENU_PATH.RULE_BOOL_COMPARE)]
-    public class BoolCompare : Rule
+    [CreateAssetMenu(fileName = FILE_NAME.RULE_DATA, menuName = MENU_PATH.RULE_DATA)]
+    public class DataRule : Rule
     {
-        [SerializeField] private BoolCompareStruct rule;
+        [SerializeField] private DataRuleStruct rule;
 
         public override RuleResult Evaluate(IGameContext context) => rule.Evaluate(context);
     }

@@ -8,7 +8,7 @@ namespace antunity.GameSystems.Rules
 
     [Serializable]
     [GameDataDrawer(GameDataLayout.Horizontal)]
-    public struct CompositeStruct : IRule, IUseGameDataDrawer
+    public struct CompositeRuleStruct : IRule, IUseGameDataDrawer
     {
         [Tooltip("The first rule to evaluate")]
         [SerializeField] private Rule rule1;
@@ -48,9 +48,9 @@ namespace antunity.GameSystems.Rules
 
     [Serializable]
     [CreateAssetMenu(fileName = FILE_NAME.RULE_COMPOSITE, menuName = MENU_PATH.RULE_COMPOSITE)]
-    public class Composite : Rule
+    public class CompositeRule : Rule
     {
-        [SerializeField] private CompositeStruct rule;
+        [SerializeField] private CompositeRuleStruct rule;
 
         public override RuleResult Evaluate(IGameContext context) => rule.Evaluate(context);
     }
